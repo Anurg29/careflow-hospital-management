@@ -1,1 +1,5 @@
-build
+{
+  "projects": {
+    "default": "careflow-hospital"
+  }
+}

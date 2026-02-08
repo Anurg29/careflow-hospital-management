@@ -119,9 +119,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
     ),
-    # ─── Authentication: JWT tokens required by default ───
+    # ─── Authentication: Custom JWT for MongoDB User ───
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'queueing.authentication.CustomJWTAuthentication',
     ),
     # ─── Permissions: all endpoints require login by default ───
     'DEFAULT_PERMISSION_CLASSES': (
@@ -146,6 +146,8 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'USER_ID_FIELD': 'id',  # Use 'id' field from our custom User model
+    'USER_ID_CLAIM': 'user_id',
 }
 
 redis_url = os.getenv('REDIS_URL')

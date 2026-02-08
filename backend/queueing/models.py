@@ -3,6 +3,41 @@ from typing import Optional
 
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.hashers import make_password, check_password
+
+
+class User(models.Model):
+    """Custom User model for MongoDB storage"""
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(blank=True)
+    password = models.CharField(max_length=128)  # Stores hashed password
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(null=True, blank=True)
+    
+    # Additional patient information
+    first_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    address = models.TextField(blank=True)
+    blood_group = models.CharField(max_length=5, blank=True)  # A+, B+, O+, etc.
+    emergency_contact = models.CharField(max_length=20, blank=True)
+    
+    def set_password(self, raw_password):
+        """Hash and set the password"""
+        self.password = make_password(raw_password)
+    
+    def check_password(self, raw_password):
+        """Check if the raw password matches the hashed password"""
+        return check_password(raw_password, self.password)
+    
+    def __str__(self):
+        return self.username
+    
+    class Meta:
+        db_table = 'queueing_user'
 
 
 class Hospital(models.Model):
