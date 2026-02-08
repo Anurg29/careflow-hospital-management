@@ -6,16 +6,24 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ─── Load .env ───
-load_dotenv(BASE_DIR / '.env')
+# ─── Load .env (only if file exists, e.g., local development) ───
+env_file = BASE_DIR / '.env'
+if env_file.exists():
+    load_dotenv(env_file)
 
 # ─── Core ───
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
-    raise RuntimeError('DJANGO_SECRET_KEY is not set – check your .env file')
+    raise RuntimeError('DJANGO_SECRET_KEY environment variable is not set')
 
 DEBUG = os.getenv('DJANGO_DEBUG', 'false').lower() == 'true'
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
+
+# Render provides RENDER_EXTERNAL_HOSTNAME automatically
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS = [RENDER_EXTERNAL_HOSTNAME, 'localhost', '127.0.0.1']
+else:
+    ALLOWED_HOSTS = [h.strip() for h in os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
