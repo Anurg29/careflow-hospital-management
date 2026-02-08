@@ -229,3 +229,108 @@ export async function fetchDashboard(hospitalId) {
   const { data } = await api.get(endpoints.dashboard(hospitalId));
   return data;
 }
+
+// ─── Patient API Functions ───
+
+export async function patientRegister(userData) {
+  const { data } = await api.post('/patient/register/', userData);
+  if (data.tokens) {
+    localStorage.setItem('access_token', data.tokens.access);
+    localStorage.setItem('refresh_token', data.tokens.refresh);
+  }
+  return data;
+}
+
+export async function patientLogin(credentials) {
+  const { data } = await api.post('/patient/login/', credentials);
+  if (data.tokens) {
+    localStorage.setItem('access_token', data.tokens.access);
+    localStorage.setItem('refresh_token', data.tokens.refresh);
+  }
+  return data;
+}
+
+export async function fetchHospitalsList() {
+  const { data } = await api.get('/patient/hospitals/');
+  return data;
+}
+
+export async function fetchDepartmentsList(hospitalId) {
+  const params = hospitalId ? { hospital_id: hospitalId } : {};
+  const { data } = await api.get('/patient/departments/', { params });
+  return data;
+}
+
+export async function fetchAvailableSlots(params) {
+  const { data } = await api.get('/patient/available-slots/', { params });
+  return data;
+}
+
+export async function bookAppointment(appointmentData) {
+  const { data } = await api.post('/patient/book-appointment/', appointmentData);
+  return data;
+}
+
+export async function fetchMyAppointments() {
+  const { data } = await api.get('/patient/my-appointments/');
+  return data;
+}
+
+export async function cancelAppointment(appointmentId) {
+  const { data } = await api.delete(`/patient/appointments/${appointmentId}/cancel/`);
+  return data;
+}
+
+export async function fetchQueueStatus(hospitalId) {
+  const { data } = await api.get(`/patient/queue-status/${hospitalId}/`);
+  return data;
+}
+
+// ─── Payment API Functions ───
+
+export async function initiatePayment(paymentData) {
+  const { data } = await api.post('/patient/payment/initiate/', paymentData);
+  return data;
+}
+
+export async function verifyPayment(verificationData) {
+  const { data } = await api.post('/patient/payment/verify/', verificationData);
+  return data;
+}
+
+export async function fetchPaymentStatus(transactionId) {
+  const { data } = await api.get(`/patient/payment/status/${transactionId}/`);
+  return data;
+}
+
+export async function fetchPaymentHistory() {
+  const { data } = await api.get('/patient/payment/history/');
+  return data;
+}
+
+// ─── Admin API Functions ───
+
+export async function fetchAdminAppointments(params = {}) {
+  const { data } = await api.get('/admin/appointments/', { params });
+  return data;
+}
+
+export async function fetchAdminAppointmentDetail(appointmentId) {
+  const { data } = await api.get(`/admin/appointments/${appointmentId}/`);
+  return data;
+}
+
+export async function updateAppointmentStatus(appointmentId, status) {
+  const { data } = await api.patch(`/admin/appointments/${appointmentId}/status/`, { status });
+  return data;
+}
+
+export async function fetchAdminDashboardStats() {
+  const { data } = await api.get('/admin/dashboard/stats/');
+  return data;
+}
+
+export async function fetchAdminPatients() {
+  const { data } = await api.get('/admin/patients/');
+  return data;
+}
