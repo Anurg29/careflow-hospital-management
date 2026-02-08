@@ -8,7 +8,7 @@ from datetime import datetime
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from .models import Hospital, Department, Bed, QueueEntry, AppointmentSlot
+from .models import User, Hospital, Department, Bed, QueueEntry, AppointmentSlot
 
 logger = logging.getLogger(__name__)
 
@@ -108,3 +108,13 @@ def appointment_saved(sender, instance, **kwargs):
 @receiver(post_delete, sender=AppointmentSlot)
 def appointment_deleted(sender, instance, **kwargs):
     _sync_delete('appointment_slots', instance)
+
+
+@receiver(post_save, sender=User)
+def user_saved(sender, instance, **kwargs):
+    _sync_save('users', instance)
+
+
+@receiver(post_delete, sender=User)
+def user_deleted(sender, instance, **kwargs):
+    _sync_delete('users', instance)

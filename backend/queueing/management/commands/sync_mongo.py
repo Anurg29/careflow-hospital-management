@@ -5,7 +5,7 @@ Usage: python manage.py sync_mongo
 from django.core.management.base import BaseCommand
 
 from queueing.mongo import get_mongo_db
-from queueing.models import Hospital, Department, Bed, QueueEntry, AppointmentSlot
+from queueing.models import User, Hospital, Department, Bed, QueueEntry, AppointmentSlot
 from queueing.mongo_sync import _model_to_doc
 
 
@@ -28,6 +28,7 @@ class Command(BaseCommand):
 
         # Sync existing data
         model_map = {
+            'users': User,
             'hospitals': Hospital,
             'departments': Department,
             'beds': Bed,
