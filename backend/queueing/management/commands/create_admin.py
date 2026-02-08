@@ -11,9 +11,9 @@ class Command(BaseCommand):
     help = 'Create hospital admin user with predefined credentials'
 
     def handle(self, *args, **options):
-        username = 'anurag2908@gmail.com'
+        username = 'anuragrokade2908@gmail.com'
         password = 'Anurag2908'
-        email = 'anurag2908@gmail.com'
+        email = 'anuragrokade2908@gmail.com'
         
         # Check if user already exists
         if User.objects.filter(username=username).exists():
