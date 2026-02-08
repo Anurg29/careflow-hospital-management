@@ -22,8 +22,13 @@ def _get_db():
 def _model_to_doc(instance):
     """Convert a Django model instance to a MongoDB document dict."""
     doc = {'_django_id': instance.pk}
+    # Skip many-to-many and reverse relations
+    skip_fields = ['groups', 'user_permissions', 'logentry_set', 'outstandingtoken_set', 'blacklistedtoken_set']
+    
     for field in instance._meta.get_fields():
         if not hasattr(field, 'attname'):
+            continue
+        if field.attname in skip_fields:
             continue
         val = getattr(instance, field.attname, None)
         # Convert datetime to ISO string for clean storage
