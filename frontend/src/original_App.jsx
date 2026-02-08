@@ -81,7 +81,7 @@ function DashboardShell() {
   useEffect(() => {
     fetchHospitals()
       .then(setHospitals)
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Load data when hospital changes
@@ -278,97 +278,117 @@ function DashboardShell() {
   };
 
   return (
-    <div className="app-shell">
-      <Header
-        wsStatus={wsStatus}
-        hospitalId={hospitalId}
-        hospitals={hospitals}
-        onHospitalChange={setHospitalId}
-        onRefresh={refreshAll}
-        onConnect={connectWs}
-        loading={loading}
-      />
-
-      {/* Tabs */}
-      <div style={{ marginTop: 20 }}>
-        <div className="tabs" style={{ display: 'inline-flex' }}>
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              className={`tab ${activeTab === t.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(t.id)}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-float" style={{ top: '10%', left: '10%' }}></div>
+        <div className="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ top: '50%', right: '10%', animationDelay: '-5s' }}></div>
+        <div className="absolute w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-float" style={{ bottom: '10%', left: '50%', animationDelay: '-10s' }}></div>
       </div>
 
-      {/* Tab Content */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
-          style={{ marginTop: 20 }}
-        >
-          {activeTab === 'dashboard' && (
-            <div className="grid" style={{ gridTemplateColumns: '1fr 360px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <StatusBoard snapshot={snapshot} hospitalId={hospitalId} />
-                <QueuePanel
-                  entries={queueEntries.filter((e) => e.status !== 'done')}
-                  onStart={handleStart}
-                  onComplete={handleComplete}
-                  compact
-                />
-                <DashboardCharts metrics={dashboard} />
-              </div>
-              <ActivityLog lines={lines} onClear={clear} />
-            </div>
-          )}
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30 pointer-events-none"></div>
 
-          {activeTab === 'queue' && (
-            <QueuePanel entries={queueEntries} onStart={handleStart} onComplete={handleComplete} />
-          )}
+      <div className="relative z-10 app-shell">
+        <Header
+          wsStatus={wsStatus}
+          hospitalId={hospitalId}
+          hospitals={hospitals}
+          onHospitalChange={setHospitalId}
+          onRefresh={refreshAll}
+          onConnect={connectWs}
+          loading={loading}
+        />
 
-          {activeTab === 'beds' && <BedsPanel beds={beds} />}
-
-          {activeTab === 'patient' && (
-            <PatientPanel
-              onLookupQueue={handleLookupQueue}
-              queueResult={patientQueue}
-              appointments={appointments}
-              onReloadAppointments={reloadAppointments}
-            />
-          )}
-
-          {activeTab === 'analytics' && (
-            <div className="grid" style={{ gridTemplateColumns: '1.2fr 0.8fr', gap: 16 }}>
-              <DashboardCharts metrics={dashboard} />
-              <ActivityLog lines={lines} onClear={clear} />
-              <button className="btn btn-ghost" onClick={reloadDashboard} style={{ justifySelf: 'start' }}>
-                Refresh analytics
+        {/* Tabs */}
+        <div style={{ marginTop: 20 }}>
+          <div className="tabs" style={{ display: 'inline-flex' }}>
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                className={`tab ${activeTab === t.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(t.id)}
+              >
+                {t.label}
               </button>
-            </div>
-          )}
+            ))}
+          </div>
+        </div>
 
-          {activeTab === 'manage' && (
-            <FormsPanel
-              hospitalId={hospitalId}
-              departments={departments}
-              onCreateHospital={handleCreateHospital}
-              onCreateDepartment={handleCreateDepartment}
-              onCreateQueue={handleCreateQueue}
-              onStart={handleStart}
-              onComplete={handleComplete}
-              onBed={handleBed}
-            />
-          )}
-        </motion.div>
-      </AnimatePresence>
+        {/* Tab Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            style={{ marginTop: 20 }}
+          >
+            {activeTab === 'dashboard' && (
+              <div className="grid" style={{ gridTemplateColumns: '1fr 360px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  <StatusBoard snapshot={snapshot} hospitalId={hospitalId} />
+                  <QueuePanel
+                    entries={queueEntries.filter((e) => e.status !== 'done')}
+                    onStart={handleStart}
+                    onComplete={handleComplete}
+                    compact
+                  />
+                  <DashboardCharts metrics={dashboard} />
+                </div>
+                <ActivityLog lines={lines} onClear={clear} />
+              </div>
+            )}
+
+            {activeTab === 'queue' && (
+              <QueuePanel entries={queueEntries} onStart={handleStart} onComplete={handleComplete} />
+            )}
+
+            {activeTab === 'beds' && <BedsPanel beds={beds} />}
+
+            {activeTab === 'patient' && (
+              <PatientPanel
+                onLookupQueue={handleLookupQueue}
+                queueResult={patientQueue}
+                appointments={appointments}
+                onReloadAppointments={reloadAppointments}
+              />
+            )}
+
+            {activeTab === 'analytics' && (
+              <div className="grid" style={{ gridTemplateColumns: '1.2fr 0.8fr', gap: 16 }}>
+                <DashboardCharts metrics={dashboard} />
+                <ActivityLog lines={lines} onClear={clear} />
+                <button className="btn btn-ghost" onClick={reloadDashboard} style={{ justifySelf: 'start' }}>
+                  Refresh analytics
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'manage' && (
+              <FormsPanel
+                hospitalId={hospitalId}
+                departments={departments}
+                onCreateHospital={handleCreateHospital}
+                onCreateDepartment={handleCreateDepartment}
+                onCreateQueue={handleCreateQueue}
+                onStart={handleStart}
+                onComplete={handleComplete}
+                onBed={handleBed}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -30px) scale(1.05); }
+          66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+      `}</style>
     </div>
   );
 }
