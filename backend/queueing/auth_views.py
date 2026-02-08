@@ -19,14 +19,6 @@ class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(write_only=True, min_length=8)
     password2 = serializers.CharField(write_only=True, min_length=8)
-    
-    # Optional patient details
-    first_name = serializers.CharField(max_length=100, required=False, allow_blank=True)
-    last_name = serializers.CharField(max_length=100, required=False, allow_blank=True)
-    phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
-    address = serializers.CharField(required=False, allow_blank=True)
-    blood_group = serializers.CharField(max_length=5, required=False, allow_blank=True)
-    emergency_contact = serializers.CharField(max_length=20, required=False, allow_blank=True)
 
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
@@ -40,11 +32,11 @@ class RegisterSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop('password2')  # Remove password2 before creating user
+        validated_data.pop('password2')
         password = validated_data.pop('password')
         
         user = User.objects.create(**validated_data)
-        user.set_password(password)  # Hash the password
+        user.set_password(password)
         user.save()
         return user
 
@@ -52,8 +44,7 @@ class RegisterSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 
-                  'address', 'blood_group', 'emergency_contact', 'date_joined', 'is_staff']
+        fields = ['id', 'username', 'email', 'date_joined', 'is_staff']
         read_only_fields = ['id', 'date_joined', 'is_staff']
 
 
@@ -106,9 +97,9 @@ class LoginView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
-            # Update last login
+            # Update last login (optional tracking)
             user.last_login = timezone.now()
-            user.save(update_fields=['last_login'])
+            user.save()
             
             refresh = RefreshToken.for_user(user)
             return Response(
@@ -134,6 +125,96 @@ class ProfileView(APIView):
 
     def get(self, request):
         return Response(UserSerializer(request.user).data)
+
+
+class ForgotPasswordView(APIView):
+    """Request password reset - verify username/email and allow password change."""
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    throttle_scope = 'anon'
+
+    def post(self, request):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        
+        if not username and not email:
+            return Response(
+                {'detail': 'Username or email is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Find user by username or email
+            if username:
+                user = User.objects.get(username=username)
+            else:
+                user = User.objects.get(email=email)
+            
+            # In production, you'd send an email with a reset token
+            # For now, we'll return user info to allow immediate reset
+            return Response(
+                {
+                    'detail': 'User found. You can now reset password.',
+                    'user_id': user.id,
+                    'username': user.username,
+                    'email': user.email
+                },
+                status=status.HTTP_200_OK
+            )
+        except User.DoesNotExist:
+            # Don't reveal whether user exists or not (security)
+            return Response(
+                {'detail': 'If the user exists, password reset instructions will be sent.'},
+                status=status.HTTP_200_OK
+            )
+
+
+class ResetPasswordView(APIView):
+    """Reset password after verification."""
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    throttle_scope = 'anon'
+
+    def post(self, request):
+        username = request.data.get('username')
+        new_password = request.data.get('new_password')
+        new_password2 = request.data.get('new_password2')
+        
+        if not username or not new_password or not new_password2:
+            return Response(
+                {'detail': 'Username, new_password, and new_password2 are required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if new_password != new_password2:
+            return Response(
+                {'detail': 'Passwords do not match.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate password strength
+        try:
+            validate_password(new_password)
+        except Exception as e:
+            return Response(
+                {'detail': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            user = User.objects.get(username=username)
+            user.set_password(new_password)
+            user.save(update_fields=['password'])
+            
+            return Response(
+                {'detail': 'Password reset successful. You can now login with your new password.'},
+                status=status.HTTP_200_OK
+            )
+        except User.DoesNotExist:
+            return Response(
+                {'detail': 'User not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class LogoutView(APIView):

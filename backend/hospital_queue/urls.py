@@ -4,7 +4,10 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from queueing.auth_views import LoginView, LogoutView, ProfileView, RegisterView
+from queueing.auth_views import (
+    LoginView, LogoutView, ProfileView, RegisterView,
+    ForgotPasswordView, ResetPasswordView
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,6 +18,8 @@ urlpatterns = [
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='auth-refresh'),
     path('api/auth/logout/', LogoutView.as_view(), name='auth-logout'),
     path('api/auth/profile/', ProfileView.as_view(), name='auth-profile'),
+    path('api/auth/forgot-password/', ForgotPasswordView.as_view(), name='auth-forgot-password'),
+    path('api/auth/reset-password/', ResetPasswordView.as_view(), name='auth-reset-password'),
 
     # ─── App API ───
     path('api/', include('queueing.urls')),

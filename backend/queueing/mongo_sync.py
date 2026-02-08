@@ -38,6 +38,9 @@ def _model_to_doc(instance):
 def _sync_save(collection_name, instance):
     try:
         db = _get_db()
+        if db is None:
+            logger.debug('MongoDB not available, skipping sync for %s #%s', collection_name, instance.pk)
+            return
         doc = _model_to_doc(instance)
         db[collection_name].update_one(
             {'_django_id': instance.pk},

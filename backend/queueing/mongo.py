@@ -22,7 +22,12 @@ def get_mongo_client():
         uri = getattr(settings, 'MONGO_URI', None)
         if not uri:
             raise RuntimeError('MONGO_URI is not configured in settings')
-        _client = MongoClient(uri)
+        # Add timeouts to prevent hanging
+        _client = MongoClient(
+            uri,
+            serverSelectionTimeoutMS=5000,  # 5 second timeout for server selection
+            connectTimeoutMS=5000,  # 5 second timeout for connection
+        )
         # Quick connection test
         try:
             _client.admin.command('ping')
@@ -34,10 +39,14 @@ def get_mongo_client():
 
 
 def get_mongo_db():
-    """Return the default database handle."""
+    """Return the default database handle, or None if unavailable."""
     global _db
     if _db is None:
-        client = get_mongo_client()
-        db_name = getattr(settings, 'MONGO_DB_NAME', 'careflow')
-        _db = client[db_name]
+        try:
+            client = get_mongo_client()
+            db_name = getattr(settings, 'MONGO_DB_NAME', 'careflow')
+            _db = client[db_name]
+        except Exception as exc:
+            logger.warning('MongoDB database not available: %s', exc)
+            return None
     return _db

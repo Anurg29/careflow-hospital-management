@@ -130,7 +130,7 @@ export async function register(payload) {
 
 export async function login(username, password) {
   const { data } = await api.post(endpoints.login, { username, password });
-  setTokens(data.access, data.refresh);
+  setTokens(data.tokens.access, data.tokens.refresh);
   return data;
 }
 
