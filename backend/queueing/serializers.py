@@ -14,15 +14,6 @@ class PatientRegisterSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=8)
     password2 = serializers.CharField(write_only=True, min_length=8)
     
-    # Optional patient details
-    first_name = serializers.CharField(max_length=100, required=False, allow_blank=True)
-    last_name = serializers.CharField(max_length=100, required=False, allow_blank=True)
-    phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
-    date_of_birth = serializers.DateField(required=False, allow_null=True)
-    address = serializers.CharField(required=False, allow_blank=True)
-    blood_group = serializers.CharField(max_length=5, required=False, allow_blank=True)
-    emergency_contact = serializers.CharField(max_length=20, required=False, allow_blank=True)
-    
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError('Username already taken.')
@@ -86,7 +77,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
     """Serializer for Appointment"""
     hospital_name = serializers.CharField(source='hospital.name', read_only=True)
     department_name = serializers.CharField(source='department.name', read_only=True)
-    patient_name = serializers.CharField(source='patient.full_name', read_only=True)
+    patient_name = serializers.CharField(source='patient.username', read_only=True)
     slot_time = serializers.SerializerMethodField()
     
     class Meta:
@@ -138,13 +129,8 @@ class AppointmentDetailSerializer(serializers.ModelSerializer):
         return {
             'id': patient.id,
             'username': patient.username,
-            'full_name': patient.full_name,
             'email': patient.email,
-            'phone': patient.phone,
-            'date_of_birth': patient.date_of_birth,
-            'blood_group': patient.blood_group,
-            'address': patient.address,
-            'emergency_contact': patient.emergency_contact,
+            'role': patient.role,
         }
     
     def get_payment_details(self, obj):
@@ -164,7 +150,7 @@ class AppointmentDetailSerializer(serializers.ModelSerializer):
 
 class PaymentSerializer(serializers.ModelSerializer):
     """Serializer for Payment"""
-    patient_name = serializers.CharField(source='patient.full_name', read_only=True)
+    patient_name = serializers.CharField(source='patient.username', read_only=True)
     appointment_info = serializers.SerializerMethodField()
     
     class Meta:

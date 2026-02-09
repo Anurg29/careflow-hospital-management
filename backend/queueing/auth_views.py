@@ -19,6 +19,7 @@ class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(write_only=True, min_length=8)
     password2 = serializers.CharField(write_only=True, min_length=8)
+    role = serializers.ChoiceField(choices=['admin', 'patient'], default='patient')
 
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
@@ -37,6 +38,11 @@ class RegisterSerializer(serializers.Serializer):
         
         user = User.objects.create(**validated_data)
         user.set_password(password)
+        
+        # Set is_staff for admin users
+        if user.role == 'admin':
+            user.is_staff = True
+        
         user.save()
         return user
 
@@ -44,7 +50,7 @@ class RegisterSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'date_joined', 'is_staff']
+        fields = ['id', 'username', 'email', 'role', 'date_joined', 'is_staff']
         read_only_fields = ['id', 'date_joined', 'is_staff']
 
 

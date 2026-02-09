@@ -194,12 +194,10 @@ class AdminPatientsListView(APIView):
                 'id': p.id,
                 'username': p.username,
                 'email': p.email,
-                'full_name': p.full_name,
-                'phone': p.phone,
-                'blood_group': p.blood_group,
+                'role': p.role,
                 'date_joined': p.date_joined,
-                'total_appointments': p.appointments.count(),
-                'completed_appointments': p.appointments.filter(status='completed').count(),
+                'total_appointments': p.appointments.count() if hasattr(p, 'appointments') else 0,
+                'completed_appointments': p.appointments.filter(status='completed').count() if hasattr(p, 'appointments') else 0,
             }
             for p in patients
         ])

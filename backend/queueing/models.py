@@ -23,36 +23,29 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """Custom User model with role-based access (admin/patient)"""
+    """Simplified User model with admin/patient roles"""
     ROLE_CHOICES = [
         ('admin', 'Hospital Admin'),
         ('patient', 'Patient'),
     ]
     
-    # Authentication fields
+    # Core fields
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(blank=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='patient')
     
-    # Django required fields
+    # System fields
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
-    last_login = models.DateTimeField(null=True, blank=True)
-    
-    # Patient/User details
-    first_name = models.CharField(max_length=100, blank=True)
-    last_name = models.CharField(max_length=100, blank=True)
-    phone = models.CharField(max_length=20, blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
-    address = models.TextField(blank=True)
-    blood_group = models.CharField(max_length=5, blank=True)  # A+, B+, O+, etc.
-    emergency_contact = models.CharField(max_length=20, blank=True)
     
     objects = UserManager()
     
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
+    
+    class Meta:
+        db_table = 'queueing_user'
     
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
@@ -66,16 +59,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_patient(self):
         """Check if user is patient"""
         return self.role == 'patient'
-    
-    @property
-    def full_name(self):
-        """Get full name"""
-        if self.first_name or self.last_name:
-            return f"{self.first_name} {self.last_name}".strip()
-        return self.username
-    
-    class Meta:
-        db_table = 'queueing_user'
 
 
 class Hospital(models.Model):

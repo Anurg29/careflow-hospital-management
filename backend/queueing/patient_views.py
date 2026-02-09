@@ -41,8 +41,6 @@ class PatientRegisterView(APIView):
                 'username': user.username,
                 'email': user.email,
                 'role': user.role,
-                'full_name': user.full_name,
-                'phone': user.phone,
             },
             'tokens': {
                 'access': str(refresh.access_token),
@@ -95,8 +93,6 @@ class PatientLoginView(APIView):
                     'username': user.username,
                     'email': user.email,
                     'role': user.role,
-                    'full_name': user.full_name,
-                    'phone': user.phone,
                 },
                 'tokens': {
                     'access': str(refresh.access_token),
