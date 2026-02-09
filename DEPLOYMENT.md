@@ -11,29 +11,93 @@
 
 ## Part 1: Push to GitHub
 
-1. Initialize git repository (if not already done):
-   ```bash
-   cd /Users/anuragdineshrokade/Documents/doctor
-   git init
-   git add .
-   git commit -m "Initial commit - CareFlow Hospital Management System"
-   ```
 
-2. Create a new repository on GitHub (https://github.com/new)
-   - Name: `careflow-hospital-management`
-   - Keep it Public or Private
-   - Don't initialize with README (we already have code)
 
-3. Push to GitHub:
-   ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/careflow-hospital-management.git
-   git branch -M main
-   git push -u origin main
-   ```
+**Basic Settings:**2. Click **"Login"** → Sign in with **GitHub** (easiest option)
 
----
+- **Name:** `careflow-backend`
 
-## Part 2: Deploy Backend to Render
+- **Region:** `Oregon (US West)` (or closest to you)3. Authorize Railway to access your GitHub repos1. Initialize git repository (if not already done):
+
+- **Branch:** `main`
+
+- **Root Directory:** `backend`   ```bash
+
+- **Runtime:** `Python 3`
+
+- **Build Command:**### 1.2 Deploy Your Backend   cd /Users/anuragdineshrokade/Documents/doctor
+
+  ```bash
+
+  pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput1. Click **"New Project"**   git init
+
+  ```
+
+- **Start Command:**2. Select **"Deploy from GitHub repo"**   git add .
+
+  ```bash
+
+  gunicorn hospital_queue.wsgi:application3. Choose **`careflow-hospital-management`** repository   git commit -m "Initial commit - CareFlow Hospital Management System"
+
+  ```
+
+4. Railway will auto-detect Django in the `/backend` folder   ```
+
+**Instance Type:**
+
+- Select **"Free"** (750 hours/month)
+
+
+
+### 1.4 Add Environment Variables### 1.3 Configure Environment Variables2. Create a new repository on GitHub (https://github.com/new)
+
+Scroll down to **"Environment Variables"** → Click **"Add Environment Variable"** for each:
+
+Go to your project → **Variables** tab → Click **"+ New Variable"** for each:   - Name: `careflow-hospital-management`
+
+```bash
+
+PYTHON_VERSION=3.9.18   - Keep it Public or Private
+
+DJANGO_SECRET_KEY=(c_r+k@qhjx^tilofwv&i9%qlf684^*06-4k0#u&fim&px=r1-
+
+DJANGO_DEBUG=false```bash   - Don't initialize with README (we already have code)
+
+DJANGO_SETTINGS_MODULE=hospital_queue.settings
+
+MONGO_URL=mongodb+srv://anuragrokade965:anurag29@cluster1.1mvedwk.mongodb.net/?appName=Cluster1DJANGO_SECRET_KEY=your-production-secret-key-min-50-chars
+
+MONGO_DB_NAME=careflow
+
+PORT=10000DJANGO_DEBUG=false3. Push to GitHub:
+
+```
+
+MONGO_URL=mongodb+srv://anuragrokade965:anurag29@cluster1.1mvedwk.mongodb.net/?appName=Cluster1   ```bash
+
+### 1.5 Deploy!
+
+1. Click **"Create Web Service"**MONGO_DB_NAME=careflow   git remote add origin https://github.com/YOUR_USERNAME/careflow-hospital-management.git
+
+2. Wait 5-8 minutes for first deployment
+
+3. You'll get a URL like: `https://careflow-backend.onrender.com`PORT=8000   git branch -M main
+
+4. **📋 Copy this URL** - you'll need it for Firebase!
+
+```   git push -u origin main
+
+### 1.6 Test Backend
+
+```bash   ```
+
+curl https://your-render-url.onrender.com/api/hospitals/
+
+```**Generate a strong SECRET_KEY** (run locally):
+
+Should return `[]` (empty array).
+
+```bash### Part 2: Deploy Backend to Render
 
 ### 2.1 Create Render Account
 1. **Go to** https://render.com and sign in with GitHub
