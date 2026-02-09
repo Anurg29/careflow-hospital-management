@@ -38,15 +38,21 @@
   --radius-xl: 20px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.3), 0 4px 6px -4px rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
   --shadow-glow: 0 0 40px var(--accent-glow);
 
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   background: var(--bg-primary);
@@ -73,7 +79,10 @@ body::before {
   z-index: 0;
 }
 
-#root { position: relative; z-index: 1; }
+#root {
+  position: relative;
+  z-index: 1;
+}
 
 /* ─── Layout ─── */
 .app-shell {
@@ -83,10 +92,27 @@ body::before {
 }
 
 /* ─── Typography ─── */
-h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
-h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
-h3 { font-size: 1rem; font-weight: 600; }
-p { line-height: 1.6; }
+h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+p {
+  line-height: 1.6;
+}
 
 /* ─── Cards ─── */
 .card {
@@ -107,5 +133,346 @@ p { line-height: 1.6; }
   box-shadow: var(--shadow-glow);
 }
 
-/* Rest of the existing CSS remains the same... */
-/* (All the rest of your existing CSS) */
+/* ─── Panels ─── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ─── Buttons ─── */
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-hover);
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  color: var(--text-primary);
+  transform: rotate(90deg);
+}
+
+/* ─── Inputs & Forms ─── */
+.input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 14px;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ─── Modals ─── */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ─── Badges ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge-success {
+  background: var(--green-soft);
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+
+.badge-info {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.badge-warning {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border: 1px solid var(--amber);
+}
+
+.badge-error {
+  background: var(--red-soft);
+  color: var(--red);
+  border: 1px solid var(--red);
+}
+
+.badge-primary {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border: 1px solid var(--blue);
+}
+
+/* ─── Stats ─── */
+.stat-mini {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ─── Empty States ─── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+/* ─── Info Box ─── */
+.info-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.info-box h4 {
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.info-box p {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.info-box p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Success Message ─── */
+.success-message {
+  background: var(--green-soft);
+  border: 1px solid var(--green);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.success-message h3 {
+  color: var(--green);
+}
+
+/* ─── Grid ─── */
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+/* ─── Loading Spinner ─── */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Tabs ─── */
+.tabs {
+  display: flex;
+  gap: 8px;
+  background: var(--bg-elevated);
+  padding: 4px;
+  border-radius: var(--radius-md);
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: var(--bg-card);
+  color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab:hover:not(.active) {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* ─── Utilities ─── */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-tertiary {
+  color: var(--text-muted);
+}
+
+.color-primary {
+  color: var(--accent);
+}
+
+.color-success {
+  color: var(--green);
+}
+
+.color-warning {
+  color: var(--amber);
+}
+
+.color-error {
+  color: var(--red);
+}
+
+.color-info {
+  color: var(--blue);
+}
+
+.bg-primary {
+  background: var(--bg-primary);
+}
+
+.bg-secondary {
+  background: var(--bg-secondary);
+}
+
+.border-color {
+  border-color: var(--border);
+}

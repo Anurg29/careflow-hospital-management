@@ -26,6 +26,7 @@ import { QueuePanel } from './components/QueuePanel.jsx';
 import { BedsPanel } from './components/BedsPanel.jsx';
 import { FormsPanel } from './components/FormsPanel.jsx';
 import { ActivityLog } from './components/ActivityLog.jsx';
+import { PatientsPanel } from './components/PatientsPanel.jsx';
 import { useLogStore } from './store/useLogStore.js';
 import useAuthStore from './store/useAuthStore.js';
 import AuthPage from './components/AuthPage.jsx';
@@ -34,6 +35,7 @@ const tabs = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'queue', label: 'Patient Queue' },
   { id: 'beds', label: 'Beds' },
+  { id: 'patients', label: 'Patients' },
   { id: 'patient', label: 'Patient View' },
   { id: 'analytics', label: 'Analytics' },
   { id: 'manage', label: 'Manage' },
@@ -346,6 +348,8 @@ function DashboardShell() {
             )}
 
             {activeTab === 'beds' && <BedsPanel beds={beds} />}
+
+            {activeTab === 'patients' && <PatientsPanel />}
 
             {activeTab === 'patient' && (
               <PatientPanel

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -248,6 +249,24 @@ export default function PatientAuth() {
                                         onSubmit={handleRegister}
                                         className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar"
                                     >
+                                        {/* Username field FIRST - most important */}
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-300 mb-1.5">Username * <span className="text-red-400">(Required)</span></label>
+                                            <div className="relative group">
+                                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-teal-400" />
+                                                <input
+                                                    type="text"
+                                                    name="username"
+                                                    value={registerData.username}
+                                                    onChange={handleRegisterChange}
+                                                    className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 outline-none transition-all"
+                                                    placeholder="johndoe (at least 3 characters)"
+                                                    required
+                                                    minLength={3}
+                                                />
+                                            </div>
+                                        </div>
+
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-xs font-medium text-gray-300 mb-1.5">First Name</label>
@@ -274,23 +293,7 @@ export default function PatientAuth() {
                                         </div>
 
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-300 mb-1.5">Username *</label>
-                                            <div className="relative group">
-                                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-teal-400" />
-                                                <input
-                                                    type="text"
-                                                    name="username"
-                                                    value={registerData.username}
-                                                    onChange={handleRegisterChange}
-                                                    className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 outline-none transition-all"
-                                                    placeholder="johndoe"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-xs font-medium text-gray-300 mb-1.5">Email *</label>
+                                            <label className="block text-xs font-medium text-gray-300 mb-1.5">Email * <span className="text-red-400">(Required)</span></label>
                                             <div className="relative group">
                                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-teal-400" />
                                                 <input

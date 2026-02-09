@@ -187,6 +187,12 @@ export async function createQueueEntry(payload) {
   return data;
 }
 
+// Join queue for patients (FCFS system)
+export async function joinQueue(payload) {
+  const { data } = await api.post(endpoints.queue, payload);
+  return data;
+}
+
 export async function fetchQueueEntry(id) {
   const { data } = await api.get(endpoints.queueItem(id));
   return data;
@@ -233,7 +239,7 @@ export async function fetchDashboard(hospitalId) {
 // ─── Patient API Functions ───
 
 export async function patientRegister(userData) {
-  const { data } = await api.post('/patient/register/', userData);
+  const { data } = await api.post('/api/patient/register/', userData);
   if (data.tokens) {
     localStorage.setItem('access_token', data.tokens.access);
     localStorage.setItem('refresh_token', data.tokens.refresh);
@@ -242,7 +248,7 @@ export async function patientRegister(userData) {
 }
 
 export async function patientLogin(credentials) {
-  const { data } = await api.post('/patient/login/', credentials);
+  const { data } = await api.post('/api/patient/login/', credentials);
   if (data.tokens) {
     localStorage.setItem('access_token', data.tokens.access);
     localStorage.setItem('refresh_token', data.tokens.refresh);
@@ -251,86 +257,98 @@ export async function patientLogin(credentials) {
 }
 
 export async function fetchHospitalsList() {
-  const { data } = await api.get('/patient/hospitals/');
+  const { data } = await api.get('/api/patient/hospitals/');
   return data;
 }
 
 export async function fetchDepartmentsList(hospitalId) {
   const params = hospitalId ? { hospital_id: hospitalId } : {};
-  const { data } = await api.get('/patient/departments/', { params });
+  const { data } = await api.get('/api/patient/departments/', { params });
   return data;
 }
 
 export async function fetchAvailableSlots(params) {
-  const { data } = await api.get('/patient/available-slots/', { params });
+  const { data } = await api.get('/api/patient/available-slots/', { params });
   return data;
 }
 
 export async function bookAppointment(appointmentData) {
-  const { data } = await api.post('/patient/book-appointment/', appointmentData);
+  const { data } = await api.post('/api/patient/book-appointment/', appointmentData);
   return data;
 }
 
 export async function fetchMyAppointments() {
-  const { data } = await api.get('/patient/my-appointments/');
+  const { data } = await api.get('/api/patient/my-appointments/');
   return data;
 }
 
 export async function cancelAppointment(appointmentId) {
-  const { data } = await api.delete(`/patient/appointments/${appointmentId}/cancel/`);
+  const { data } = await api.delete(`/api/patient/appointments/${appointmentId}/cancel/`);
   return data;
 }
 
 export async function fetchQueueStatus(hospitalId) {
-  const { data } = await api.get(`/patient/queue-status/${hospitalId}/`);
+  const { data } = await api.get(`/api/patient/queue-status/${hospitalId}/`);
   return data;
 }
 
 // ─── Payment API Functions ───
 
 export async function initiatePayment(paymentData) {
-  const { data } = await api.post('/patient/payment/initiate/', paymentData);
+  const { data } = await api.post('/api/patient/payment/initiate/', paymentData);
   return data;
 }
 
 export async function verifyPayment(verificationData) {
-  const { data } = await api.post('/patient/payment/verify/', verificationData);
+  const { data } = await api.post('/api/patient/payment/verify/', verificationData);
   return data;
 }
 
 export async function fetchPaymentStatus(transactionId) {
-  const { data } = await api.get(`/patient/payment/status/${transactionId}/`);
+  const { data } = await api.get(`/api/patient/payment/status/${transactionId}/`);
   return data;
 }
 
 export async function fetchPaymentHistory() {
-  const { data } = await api.get('/patient/payment/history/');
+  const { data } = await api.get('/api/patient/payment/history/');
   return data;
 }
 
 // ─── Admin API Functions ───
 
 export async function fetchAdminAppointments(params = {}) {
-  const { data } = await api.get('/admin/appointments/', { params });
+  const { data } = await api.get('/api/admin/appointments/', { params });
   return data;
 }
 
 export async function fetchAdminAppointmentDetail(appointmentId) {
-  const { data } = await api.get(`/admin/appointments/${appointmentId}/`);
+  const { data } = await api.get(`/api/admin/appointments/${appointmentId}/`);
   return data;
 }
 
-export async function updateAppointmentStatus(appointmentId, status) {
-  const { data } = await api.patch(`/admin/appointments/${appointmentId}/status/`, { status });
+export async function updateAppointmentStatus(appointmentId, statusData) {
+  const { data } = await api.patch(`/api/admin/appointments/${appointmentId}/status/`, statusData);
   return data;
 }
 
 export async function fetchAdminDashboardStats() {
-  const { data } = await api.get('/admin/dashboard/stats/');
+  const { data } = await api.get('/api/admin/dashboard/stats/');
   return data;
 }
 
 export async function fetchAdminPatients() {
-  const { data } = await api.get('/admin/patients/');
+  const { data } = await api.get('/api/admin/patients/');
+  return data;
+}
+
+// ✨ NEW: Register offline/walk-in patient
+export async function registerOfflinePatient(patientData) {
+  const { data } = await api.post('/api/admin/patients/register/', patientData);
+  return data;
+}
+
+// ✨ NEW: Get detailed patient profile with history
+export async function fetchPatientProfile(patientId) {
+  const { data } = await api.get(`/api/admin/patients/${patientId}/`);
   return data;
 }
