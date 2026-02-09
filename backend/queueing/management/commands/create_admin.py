@@ -1,19 +1,34 @@
 """
 Management command to create the hospital admin user
-Username: anurag2908@gmail.com
-Password: Anurag2908
+Set credentials via environment variables:
+- ADMIN_USERNAME
+- ADMIN_PASSWORD
+- ADMIN_EMAIL
 """
+import os
 from django.core.management.base import BaseCommand
 from queueing.models import User
 
 
 class Command(BaseCommand):
-    help = 'Create hospital admin user with predefined credentials'
+    help = 'Create hospital admin user. Provide credentials via environment variables or arguments.'
+
+    def add_arguments(self, parser):
+        parser.add_argument('--username', type=str, help='Admin username')
+        parser.add_argument('--password', type=str, help='Admin password')
+        parser.add_argument('--email', type=str, help='Admin email')
 
     def handle(self, *args, **options):
-        username = 'anuragrokade2908@gmail.com'
-        password = 'Anurag2908'
-        email = 'anuragrokade2908@gmail.com'
+        # Get credentials from arguments or environment variables
+        username = options.get('username') or os.getenv('ADMIN_USERNAME', 'admin')
+        password = options.get('password') or os.getenv('ADMIN_PASSWORD')
+        email = options.get('email') or os.getenv('ADMIN_EMAIL', 'admin@careflow.com')
+        
+        if not password:
+            self.stdout.write(self.style.ERROR(
+                'Password is required. Provide via --password argument or ADMIN_PASSWORD environment variable'
+            ))
+            return
         
         # Check if user already exists
         if User.objects.filter(username=username).exists():
@@ -36,4 +51,5 @@ class Command(BaseCommand):
                 is_superuser=True
             )
             self.stdout.write(self.style.SUCCESS(f'Created admin user: {username}'))
-            self.stdout.write(self.style.SUCCESS(f'Password: {password}'))
+            self.stdout.write(self.style.SUCCESS(f'Email: {email}'))
+            self.stdout.write(self.style.WARNING('Password set (not shown for security)'))

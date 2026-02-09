@@ -54,6 +54,8 @@ class PatientRegisterView(APIView):
 class PatientLoginView(APIView):
     """Login for patient users"""
     permission_classes = [AllowAny]
+    authentication_classes = []
+    throttle_scope = 'anon'
     
     def post(self, request):
         username = request.data.get('username')
@@ -61,43 +63,51 @@ class PatientLoginView(APIView):
         
         if not username or not password:
             return Response({
-                'error': 'Please provide both username and password'
+                'detail': 'Please provide both username and password'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        user = authenticate(username=username, password=password)
-        
-        if not user:
+        try:
+            # Look up user by username
+            user = User.objects.get(username=username)
+            
+            # Check password
+            if not user.check_password(password):
+                return Response({
+                    'detail': 'Invalid credentials'
+                }, status=status.HTTP_401_UNAUTHORIZED)
+            
+            # Check if user is a patient
+            if user.role != 'patient':
+                return Response({
+                    'detail': 'This login is for patients only. Please use admin login.'
+                }, status=status.HTTP_403_FORBIDDEN)
+            
+            # Update last login
+            user.last_login = timezone.now()
+            user.save(update_fields=['last_login'])
+            
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            
             return Response({
-                'error': 'Invalid credentials'
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'role': user.role,
+                    'full_name': user.full_name,
+                    'phone': user.phone,
+                },
+                'tokens': {
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                }
+            }, status=status.HTTP_200_OK)
+        
+        except User.DoesNotExist:
+            return Response({
+                'detail': 'Invalid credentials'
             }, status=status.HTTP_401_UNAUTHORIZED)
-        
-        # Check if user is a patient
-        if user.role != 'patient':
-            return Response({
-                'error': 'This login is for patients only. Please use admin login.'
-            }, status=status.HTTP_403_FORBIDDEN)
-        
-        # Update last login
-        user.last_login = timezone.now()
-        user.save(update_fields=['last_login'])
-        
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
-        
-        return Response({
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'role': user.role,
-                'full_name': user.full_name,
-                'phone': user.phone,
-            },
-            'tokens': {
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-            }
-        }, status=status.HTTP_200_OK)
 
 
 class AvailableSlotsView(APIView):

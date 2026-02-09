@@ -20,9 +20,21 @@ db.sqlite3-journal
 /staticfiles/
 /media/
 
-# Environment variables
+# Environment variables - NEVER commit these!
 .env
-.env.local
+.env.*
+!.env.example
+*.env
+backend/.env
+backend/.env.*
+!backend/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Deployment files with secrets
+DEPLOYMENT.md
+*DEPLOYMENT*.md
 
 # IDE
 .vscode/
