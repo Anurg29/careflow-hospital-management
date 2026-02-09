@@ -131,6 +131,10 @@ class AppointmentDetailSerializer(serializers.ModelSerializer):
             'username': patient.username,
             'email': patient.email,
             'role': patient.role,
+            'date_joined': patient.date_joined,
+            'total_appointments': patient.appointments.count(),
+            'completed_appointments': patient.appointments.filter(status='completed').count(),
+            'cancelled_appointments': patient.appointments.filter(status='cancelled').count(),
         }
     
     def get_payment_details(self, obj):

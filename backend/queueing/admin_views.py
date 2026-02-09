@@ -201,3 +201,137 @@ class AdminPatientsListView(APIView):
             }
             for p in patients
         ])
+
+
+class AdminRegisterPatientView(APIView):
+    """Admin can register a patient who came to the hospital offline"""
+    permission_classes = [IsAdminUser]
+    
+    def post(self, request):
+        from .serializers import PatientRegisterSerializer
+        import uuid
+        
+        username = request.data.get('username')
+        email = request.data.get('email', '')
+        password = request.data.get('password')
+        
+        # Auto-generate password if not provided (for walk-in patients)
+        if not password:
+            password = f"temp_{uuid.uuid4().hex[:8]}"
+        
+        # Validate required fields
+        if not username:
+            return Response({
+                'error': 'username is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if username already exists
+        if User.objects.filter(username__iexact=username).exists():
+            return Response({
+                'error': 'Username already exists. Please use a different username.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if email already exists (if provided)
+        if email and User.objects.filter(email__iexact=email).exists():
+            return Response({
+                'error': 'Email already registered.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create patient user
+        try:
+            user = User.objects.create(
+                username=username,
+                email=email,
+                role='patient'
+            )
+            user.set_password(password)
+            user.save()
+            
+            # Optionally create an appointment if details are provided
+            appointment = None
+            hospital_id = request.data.get('hospital_id')
+            department_id = request.data.get('department_id')
+            symptoms = request.data.get('symptoms', '')
+            notes = request.data.get('notes', '')
+            
+            if hospital_id:
+                # Admin registers patient and books appointment directly (skip payment)
+                appointment = Appointment.objects.create(
+                    patient=user,
+                    hospital_id=hospital_id,
+                    department_id=department_id if department_id else None,
+                    symptoms=symptoms,
+                    notes=notes,
+                    payment_amount=0.00,  # Walk-in patients may pay at hospital
+                    status='confirmed',  # Directly confirmed by admin
+                    payment_status='paid',  # Mark as paid (handled offline)
+                    confirmed_at=timezone.now()
+                )
+                
+                appointment_data = AppointmentSerializer(appointment).data
+            else:
+                appointment_data = None
+            
+            return Response({
+                'message': 'Patient registered successfully',
+                'patient': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'role': user.role,
+                    'temporary_password': password if not request.data.get('password') else None,
+                },
+                'appointment': appointment_data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({
+                'error': f'Failed to register patient: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AdminPatientDetailView(APIView):
+    """Get detailed patient information for admin"""
+    permission_classes = [IsAdminUser]
+    
+    def get(self, request, patient_id):
+        try:
+            patient = User.objects.get(id=patient_id, role='patient')
+        except User.DoesNotExist:
+            return Response({
+                'error': 'Patient not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get all appointments for this patient
+        appointments = Appointment.objects.filter(
+            patient=patient
+        ).select_related(
+            'hospital', 'department', 'appointment_slot'
+        ).order_by('-created_at')
+        
+        # Calculate statistics
+        total_spent = sum(
+            a.payment_amount for a in appointments.filter(payment_status='paid')
+        )
+        
+        return Response({
+            'patient': {
+                'id': patient.id,
+                'username': patient.username,
+                'email': patient.email,
+                'role': patient.role,
+                'date_joined': patient.date_joined,
+                'last_login': patient.last_login,
+            },
+            'statistics': {
+                'total_appointments': appointments.count(),
+                'confirmed': appointments.filter(status='confirmed').count(),
+                'in_progress': appointments.filter(status='in_progress').count(),
+                'completed': appointments.filter(status='completed').count(),
+                'cancelled': appointments.filter(status='cancelled').count(),
+                'pending_payment': appointments.filter(status='pending_payment').count(),
+                'total_spent': float(total_spent),
+            },
+            'appointments': AppointmentDetailSerializer(appointments, many=True).data
+        })
+

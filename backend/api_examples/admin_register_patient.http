@@ -1,0 +1,69 @@
+### Admin Register Walk-in Patient Examples
+### Use these examples to test the new admin patient registration endpoint
+
+### Example 1: Register patient only (no appointment)
+POST http://localhost:8000/api/admin/patients/register/
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+{
+  "username": "walk_in_patient_1",
+  "email": "patient1@example.com"
+}
+
+###
+
+### Example 2: Register patient with custom password
+POST http://localhost:8000/api/admin/patients/register/
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+{
+  "username": "walk_in_patient_2",
+  "email": "patient2@example.com",
+  "password": "SecurePass123!"
+}
+
+###
+
+### Example 3: Register patient AND create appointment
+POST http://localhost:8000/api/admin/patients/register/
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+{
+  "username": "walk_in_patient_3",
+  "email": "patient3@example.com",
+  "hospital_id": 1,
+  "department_id": 2,
+  "symptoms": "Fever and cough for 3 days",
+  "notes": "Walk-in patient - paid cash at reception (Rs. 500)"
+}
+
+###
+
+### Example 4: Register patient without email (useful for elderly patients)
+POST http://localhost:8000/api/admin/patients/register/
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+{
+  "username": "elderly_patient_1",
+  "hospital_id": 1,
+  "department_id": 3,
+  "symptoms": "Regular checkup",
+  "notes": "Elderly patient, no email address available"
+}
+
+###
+
+### Example 5: Just username (minimum required)
+POST http://localhost:8000/api/admin/patients/register/
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_TOKEN_HERE
+
+{
+  "username": "emergency_patient_1"
+}
+
+###

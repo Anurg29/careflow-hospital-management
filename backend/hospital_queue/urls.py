@@ -20,7 +20,7 @@ from queueing.payment_views import (
 from queueing.admin_views import (
     AdminAppointmentsListView, AdminAppointmentDetailView,
     AdminUpdateAppointmentStatusView, AdminDashboardStatsView,
-    AdminPatientsListView
+    AdminPatientsListView, AdminRegisterPatientView, AdminPatientDetailView
 )
 
 urlpatterns = [
@@ -58,6 +58,8 @@ urlpatterns = [
     path('api/admin/appointments/<int:appointment_id>/status/', AdminUpdateAppointmentStatusView.as_view(), name='admin-update-appointment'),
     path('api/admin/dashboard/stats/', AdminDashboardStatsView.as_view(), name='admin-dashboard-stats'),
     path('api/admin/patients/', AdminPatientsListView.as_view(), name='admin-patients'),
+    path('api/admin/patients/register/', AdminRegisterPatientView.as_view(), name='admin-register-patient'),
+    path('api/admin/patients/<int:patient_id>/', AdminPatientDetailView.as_view(), name='admin-patient-detail'),
 
     # ─── App API ───
     path('api/', include('queueing.urls')),
