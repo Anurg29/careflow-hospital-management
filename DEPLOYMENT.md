@@ -106,7 +106,7 @@ DJANGO_DEBUG=false```bash   - Don't initialize with README (we already have code
 
 DJANGO_SETTINGS_MODULE=hospital_queue.settings
 
-MONGO_URL=mongodb+srv://anuragrokade965:anurag29@cluster1.1mvedwk.mongodb.net/?appName=Cluster1DJANGO_SECRET_KEY=your-production-secret-key-min-50-chars
+MONGO_URL=mongodb+srv://anuragrokade965:anurag2@cluster1.1mvedwk.mongodb.net/?appName=Cluster1DJANGO_SECRET_KEY=your-production-secret-key-min-50-chars
 
 MONGO_DB_NAME=careflow
 
