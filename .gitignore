@@ -35,6 +35,8 @@ frontend/.env.*
 # Deployment files with secrets
 DEPLOYMENT.md
 *DEPLOYMENT*.md
+PRE_COMMIT_CHECKLIST.md
+*CHECKLIST*.md
 
 # IDE
 .vscode/
