@@ -67,20 +67,39 @@ class InitiatePaymentView(APIView):
             response_data['test_mode'] = True
             response_data['message'] = 'Test mode - use any payment details to complete'
             response_data['test_payment_url'] = f'/api/patient/payment/verify/'
-        
-        # TODO: If Razorpay, create order and return order_id
-        # elif payment_gateway == 'razorpay':
-        #     import razorpay
-        #     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        #     order = client.order.create({
-        #         'amount': int(payment.amount * 100),  # Convert to paise
-        #         'currency': 'INR',
-        #         'receipt': payment.transaction_id,
-        #     })
-        #     payment.gateway_order_id = order['id']
-        #     payment.save()
-        #     response_data['razorpay_order_id'] = order['id']
-        #     response_data['razorpay_key_id'] = settings.RAZORPAY_KEY_ID
+        elif payment_gateway == 'razorpay':
+            try:
+                import razorpay
+            except ImportError:
+                return Response({
+                    'error': 'Razorpay SDK is not installed'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            key_id = getattr(settings, 'RAZORPAY_KEY_ID', None)
+            key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', None)
+            if not key_id or not key_secret:
+                return Response({
+                    'error': 'Razorpay keys are not configured'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            client = razorpay.Client(auth=(key_id, key_secret))
+            # Set app details for Razorpay tracking - must match PAN card or website name
+            client.set_app_details({"title": "CareFlow", "version": "1.0.0"})
+            try:
+                order = client.order.create({
+                    'amount': int(payment.amount * 100),  # Convert to paise
+                    'currency': payment.currency,
+                    'receipt': payment.transaction_id,
+                })
+            except Exception as exc:  # pragma: no cover - network/SDK errors
+                return Response({
+                    'error': f'Failed to create Razorpay order: {exc}'
+                }, status=status.HTTP_502_BAD_GATEWAY)
+            
+            payment.gateway_order_id = order.get('id', '')
+            payment.save(update_fields=['gateway_order_id', 'updated_at'])
+            response_data['razorpay_order_id'] = order.get('id')
+            response_data['razorpay_key_id'] = key_id
         
         return Response(response_data, status=status.HTTP_201_CREATED)
 
@@ -130,31 +149,52 @@ class VerifyPaymentView(APIView):
                 payment_method=payment_method
             )
             
-        # elif payment.payment_gateway == 'razorpay':
-        #     # Verify Razorpay signature
-        #     import razorpay
-        #     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        #     
-        #     try:
-        #         params_dict = {
-        #             'razorpay_order_id': razorpay_order_id,
-        #             'razorpay_payment_id': razorpay_payment_id,
-        #             'razorpay_signature': razorpay_signature
-        #         }
-        #         client.utility.verify_payment_signature(params_dict)
-        #         
-        #         # Signature verified - mark payment as success
-        #         payment.gateway_order_id = razorpay_order_id
-        #         payment.gateway_signature = razorpay_signature
-        #         payment.mark_success(
-        #             gateway_payment_id=razorpay_payment_id,
-        #             payment_method='razorpay'
-        #         )
-        #     except razorpay.errors.SignatureVerificationError:
-        #         payment.mark_failed('Invalid payment signature')
-        #         return Response({
-        #             'error': 'Payment verification failed'
-        #         }, status=status.HTTP_400_BAD_REQUEST)
+        elif payment.payment_gateway == 'razorpay':
+            # Verify Razorpay signature
+            if not razorpay_payment_id or not razorpay_order_id or not razorpay_signature:
+                return Response({
+                    'error': 'Razorpay payment details are required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                import razorpay
+            except ImportError:
+                return Response({
+                    'error': 'Razorpay SDK is not installed'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            key_id = getattr(settings, 'RAZORPAY_KEY_ID', None)
+            key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', None)
+            
+            if not key_id or not key_secret:
+                return Response({
+                    'error': 'Razorpay keys are not configured'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            client = razorpay.Client(auth=(key_id, key_secret))
+            # Set app details for Razorpay tracking - must match PAN card or website name
+            client.set_app_details({"title": "CareFlow", "version": "1.0.0"})
+            
+            try:
+                params_dict = {
+                    'razorpay_order_id': razorpay_order_id,
+                    'razorpay_payment_id': razorpay_payment_id,
+                    'razorpay_signature': razorpay_signature
+                }
+                client.utility.verify_payment_signature(params_dict)
+                
+                # Signature verified - mark payment as success
+                payment.gateway_order_id = razorpay_order_id
+                payment.gateway_signature = razorpay_signature
+                payment.mark_success(
+                    gateway_payment_id=razorpay_payment_id,
+                    payment_method='razorpay'
+                )
+            except razorpay.errors.SignatureVerificationError:
+                payment.mark_failed('Invalid payment signature')
+                return Response({
+                    'error': 'Payment verification failed'
+                }, status=status.HTTP_400_BAD_REQUEST)
         
         else:
             return Response({

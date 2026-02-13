@@ -10,6 +10,7 @@ export default function PatientAuth() {
     const { register, login, loading, error, clearError } = usePatientStore();
     const [mode, setMode] = useState('login');
     const [showPassword, setShowPassword] = useState(false);
+    const [showPassword2, setShowPassword2] = useState(false);
 
     const [loginData, setLoginData] = useState({
         username: '',
@@ -311,27 +312,47 @@ export default function PatientAuth() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-xs font-medium text-gray-300 mb-1.5">Password *</label>
-                                                <input
-                                                    type="password"
-                                                    name="password"
-                                                    value={registerData.password}
-                                                    onChange={handleRegisterChange}
-                                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 outline-none transition-all"
-                                                    placeholder="••••••••"
-                                                    required
-                                                />
+                                                <div className="relative group">
+                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-teal-400" />
+                                                    <input
+                                                        type={showPassword ? "text" : "password"}
+                                                        name="password"
+                                                        value={registerData.password}
+                                                        onChange={handleRegisterChange}
+                                                        className="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 outline-none transition-all"
+                                                        placeholder="••••••••"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-teal-400 transition-colors"
+                                                    >
+                                                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div>
                                                 <label className="block text-xs font-medium text-gray-300 mb-1.5">Confirm *</label>
-                                                <input
-                                                    type="password"
-                                                    name="password2"
-                                                    value={registerData.password2}
-                                                    onChange={handleRegisterChange}
-                                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 outline-none transition-all"
-                                                    placeholder="••••••••"
-                                                    required
-                                                />
+                                                <div className="relative group">
+                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-teal-400" />
+                                                    <input
+                                                        type={showPassword2 ? "text" : "password"}
+                                                        name="password2"
+                                                        value={registerData.password2}
+                                                        onChange={handleRegisterChange}
+                                                        className="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/50 outline-none transition-all"
+                                                        placeholder="••••••••"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPassword2(!showPassword2)}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-teal-400 transition-colors"
+                                                    >
+                                                        {showPassword2 ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 

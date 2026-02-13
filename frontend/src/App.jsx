@@ -13,6 +13,7 @@ import PatientDashboard from './pages/PatientDashboard.jsx';
 import BookAppointment from './pages/BookAppointment.jsx';
 import MyAppointments from './pages/MyAppointments.jsx';
 import QueueStatus from './pages/QueueStatus.jsx';
+import PaymentsPage from './pages/PaymentsPage.jsx';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -65,6 +66,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <QueueStatus />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/patient/payments"
+                    element={
+                        <ProtectedRoute>
+                            <PaymentsPage />
                         </ProtectedRoute>
                     }
                 />

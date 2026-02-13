@@ -22,7 +22,22 @@ const usePatientStore = create((set, get) => ({
             });
             return data;
         } catch (err) {
-            const errorMessage = err.response?.data?.error || err.response?.data?.detail || 'Registration failed';
+            // Parse Django validation errors properly
+            let errorMessage = 'Registration failed';
+            if (err.response?.data) {
+                const errors = err.response.data;
+                if (typeof errors === 'object') {
+                    // Django returns errors like {"username": ["This field is required."]}
+                    const messages = Object.entries(errors)
+                        .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+                        .join('; ');
+                    errorMessage = messages || errorMessage;
+                } else if (errors.detail) {
+                    errorMessage = errors.detail;
+                } else if (errors.error) {
+                    errorMessage = errors.error;
+                }
+            }
             set({ error: errorMessage, loading: false });
             throw err;
         }
