@@ -25,7 +25,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
-  const [role, setRole] = useState('patient');
+  const [role] = useState('admin'); // Admin dashboard always registers as admin
   const [showPw, setShowPw] = useState(false);
 
   const switchMode = () => {
@@ -193,42 +193,6 @@ export default function AuthPage() {
                         placeholder="Enter email"
                         required
                       />
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Role Selection (register only) */}
-                {mode === 'register' && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                  >
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Account Type</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setRole('patient')}
-                        className={`p-4 rounded-xl border-2 transition-all ${
-                          role === 'patient'
-                            ? 'border-teal-500 bg-teal-500/20 text-white'
-                            : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
-                        }`}
-                      >
-                        <Heart className="w-6 h-6 mx-auto mb-2" />
-                        <div className="text-sm font-semibold">Patient</div>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRole('admin')}
-                        className={`p-4 rounded-xl border-2 transition-all ${
-                          role === 'admin'
-                            ? 'border-purple-500 bg-purple-500/20 text-white'
-                            : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
-                        }`}
-                      >
-                        <Shield className="w-6 h-6 mx-auto mb-2" />
-                        <div className="text-sm font-semibold">Admin</div>
-                      </button>
                     </div>
                   </motion.div>
                 )}
