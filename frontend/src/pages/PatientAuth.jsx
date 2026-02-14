@@ -54,7 +54,14 @@ export default function PatientAuth() {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            await register(registerData);
+            // Only send required fields for patient registration
+            const payload = {
+                username: registerData.username,
+                email: registerData.email,
+                password: registerData.password,
+                password2: registerData.password2,
+            };
+            await register(payload);
             navigate('/patient/dashboard');
         } catch (err) {
             console.error('Registration failed:', err);

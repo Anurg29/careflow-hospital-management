@@ -241,8 +241,8 @@ export async function fetchDashboard(hospitalId) {
 export async function patientRegister(userData) {
   const { data } = await api.post('/api/patient/register/', userData);
   if (data.tokens) {
-    localStorage.setItem('access_token', data.tokens.access);
-    localStorage.setItem('refresh_token', data.tokens.refresh);
+    sessionStorage.setItem('careflow_access', data.tokens.access);
+    sessionStorage.setItem('careflow_refresh', data.tokens.refresh);
   }
   return data;
 }
@@ -250,8 +250,8 @@ export async function patientRegister(userData) {
 export async function patientLogin(credentials) {
   const { data } = await api.post('/api/patient/login/', credentials);
   if (data.tokens) {
-    localStorage.setItem('access_token', data.tokens.access);
-    localStorage.setItem('refresh_token', data.tokens.refresh);
+    sessionStorage.setItem('careflow_access', data.tokens.access);
+    sessionStorage.setItem('careflow_refresh', data.tokens.refresh);
   }
   return data;
 }
